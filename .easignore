@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build and output
+build/
+dist/
+android/
+ios/
+
+# Version control
+.git/
+.gitignore
+
+# Assets (adjust as needed)
+assets/videos/
+assets/large-images/
+assets/temp/
+
+# Expo/React Native
+.expo/
+.expo-shared/
+
+# Logs and debug
+*.log
+logs/
+
+# Environment
+*.env
+*.env.*
