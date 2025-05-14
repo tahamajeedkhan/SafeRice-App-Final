@@ -1,14 +1,26 @@
 import React, { useLayoutEffect, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Image, SafeAreaView, ScrollView, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config/apiConfig';
+
+const { width, height } = Dimensions.get('window');
 
 const MainMenu = ({ navigation }) => {
   const [username, setUsername] = useState(null);
   const [token, setToken] = useState(null);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Reset navigation state when screen comes into focus
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      // Force layout update when screen is focused
+      navigation.setParams({ refresh: Date.now() });
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -140,76 +152,109 @@ const MainMenu = ({ navigation }) => {
       id: 8,
       title: 'Rice Grain Outlines',
       image: require('../../assets/grain_outline.png'),
-      navigateTo: 'Work_In_Progress',
+      navigateTo: 'Outline_Grain',
     },
   ];
 
+  // Create pairs of menu options for the grid layout
+  const menuOptionPairs = [];
+  for (let i = 0; i < menuOptions.length; i += 2) {
+    if (i + 1 < menuOptions.length) {
+      menuOptionPairs.push([menuOptions[i], menuOptions[i + 1]]);
+    } else {
+      menuOptionPairs.push([menuOptions[i]]);
+    }
+  }
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
       <ImageBackground
         source={require('../../assets/background.png')}
         style={styles.backgroundImage}
+        resizeMode="cover"
       >
-        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-          <Ionicons name="log-out-outline" size={24} color="#FF0000" />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.title}>Welcome, {username || 'User'}!</Text>
-
-        <View style={styles.gridContainer}>
-          {Array.from({ length: 4 }).map((_, rowIndex) => (
-            <View style={styles.row} key={rowIndex}>
-              {menuOptions.slice(rowIndex * 2, rowIndex * 2 + 2).map((option) => (
-                <TouchableOpacity
-                  key={option.id}
-                  style={styles.optionBox}
-                  onPress={() => navigation.navigate(option.navigateTo)}
-                >
-                  <Image source={option.image} style={styles.optionImage} />
-                  <Text style={styles.optionText}>{option.title}</Text>
-                </TouchableOpacity>
+        <View style={styles.contentContainer}>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Ionicons name="log-out-outline" size={24} color="#FF0000" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+          
+          <ScrollView 
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.title}>Welcome, {username || 'User'}!</Text>
+            
+            <View style={styles.gridContainer}>
+              {menuOptionPairs.map((pair, rowIndex) => (
+                <View style={styles.row} key={rowIndex}>
+                  {pair.map((option) => (
+                    <TouchableOpacity
+                      key={option.id}
+                      style={styles.optionBox}
+                      onPress={() => navigation.navigate(option.navigateTo)}
+                      activeOpacity={0.7}
+                    >
+                      <Image source={option.image} style={styles.optionImage} />
+                      <Text style={styles.optionText}>{option.title}</Text>
+                    </TouchableOpacity>
+                  ))}
+                  {pair.length === 1 && <View style={styles.emptySlot} />}
+                </View>
               ))}
             </View>
-          ))}
+          </ScrollView>
         </View>
       </ImageBackground>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   backgroundImage: {
     flex: 1,
     width: '100%',
-    justifyContent: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    paddingTop: 60,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+  },
+  scrollViewContent: {
+    paddingTop: 20,
+    paddingBottom: 30, // More padding at the bottom for better scrolling
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 30,
     textAlign: 'center',
   },
   gridContainer: {
-    width: '90%',
-    alignSelf: 'center',
+    width: '100%',
+    alignItems: 'center',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
+    width: '100%',
   },
   optionBox: {
     backgroundColor: 'yellowgreen',
     borderRadius: 12,
-    width: '48%', // Updated to 48% for 2 per row
+    width: '47%',
+    minHeight: Math.max(100, height * 0.12), // Responsive height based on device
     alignItems: 'center',
+    justifyContent: 'center',
     padding: 15,
     borderWidth: 2,
     borderColor: '#3B7A57',
@@ -218,6 +263,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  emptySlot: {
+    width: '47%',
   },
   optionImage: {
     width: 50,
@@ -233,10 +281,11 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     position: 'absolute',
-    top: 60,
+    top: 40,
     right: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    zIndex: 10,
   },
   logoutText: {
     color: '#FF0000',

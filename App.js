@@ -1,35 +1,47 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons'; // Importing icons for the bottom tab
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import React , {useState, useEffect} from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Icon from "react-native-vector-icons/Ionicons"; // Importing icons for the bottom tab
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { LogBox } from 'react-native';
 
 // Import all components
-import SplashScreenComponent from './components/Splash_Screen';
-import Login from './components/Login';
-import SignUp from './components/Signup';
-import MainMenu from './components/Main_Menu';
-import Health_Model from './components/Health_Model';
-import Disease_Model from './components/Disease_Model';
-import Rice_Classification_Model from './components/Rice_Classification_Model';
-import WorkInProgress from './components/Work_In_Progress';
-import Disease_Solutions from './components/Disease_Solutions';
-import Profile from './components/Profile';
-import EditProfile from './components/Edit_Profile';
-import About from './components/About';
-import Nutrition_Extraction_Multi from './components/Nutrition_Extraction_Multi';
-import Nutrition_Extraction_Single from './components/Nutrition_Extraction_Single';
-import Nutrition_Extraction from './components/Nutrition_Extraction';
-import Medicine from './components/Medicine'; 
-import Cuisine_Ideas from './components/Cuisine_Ideas';
-import Work_In_Progress from './components/Work_In_Progress';
+import SplashScreenComponent from "./components/Splash_Screen";
+import Login from "./components/Login";
+import SignUp from "./components/Signup";
+import MainMenu from "./components/Main_Menu";
+import Health_Model from "./components/Health_Model";
+import Disease_Model from "./components/Disease_Model";
+import Rice_Classification_Model from "./components/Rice_Classification_Model";
+import WorkInProgress from "./components/Work_In_Progress";
+import Disease_Solutions from "./components/Disease_Solutions";
+import Profile from "./components/Profile";
+import EditProfile from "./components/Edit_Profile";
+import About from "./components/About";
+import Nutrition_Extraction_Multi from "./components/Nutrition_Extraction_Multi";
+import Nutrition_Extraction_Single from "./components/Nutrition_Extraction_Single";
+import Nutrition_Extraction from "./components/Nutrition_Extraction";
+import Medicine from "./components/Medicine";
+import Cuisine_Ideas from "./components/Cuisine_Ideas";
+import Work_In_Progress from "./components/Work_In_Progress";
+import outline_Multi_Grain from "./components/Outline_Multi_Grain";
+import Outline_Multi_Grain from "./components/Outline_Multi_Grain";
+import Outline_Single_Grain from "./components/Outline_Single_Grain";
+import OutlineGrain from "./components/Outline_Grain";
+import Outline_Grain from "./components/Outline_Grain";
 
 const AuthStack = createStackNavigator();
 const HomeStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const AboutStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+
+
+LogBox.ignoreLogs([
+  'VirtualizedLists should never be nested inside plain ScrollViews',
+]);
 
 // Home Stack Navigator (Includes MainMenu and Model Screens)
 function HomeStackScreen() {
@@ -49,12 +61,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Health Status",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -65,12 +82,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Disease Check",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -81,12 +103,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Rice Classification",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -97,12 +124,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Disease Solutions",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -115,12 +147,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Nutrition Extraction",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -131,12 +168,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Nutrition Extraction Multi Grain",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -147,12 +189,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Nutrition Extraction Single Grain",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -165,12 +212,17 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Medicine",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -183,30 +235,82 @@ function HomeStackScreen() {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
           title: "Cuisine Ideas",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
       />
 
-      {/* Medicine Screen */}
+      {/* Nutrition Extraction Screens */}
       <HomeStack.Screen
-        name="Work_In_Progress"
-        component={Work_In_Progress}
+        name="Outline_Grain"
+        component={Outline_Grain}
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: 'lightblue',
+            backgroundColor: "white",
           },
-          title: "Rice Grain Outlines",
+          title: "Outline Grain",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <HomeStack.Screen
+        name="Outline_Multi_Grain"
+        component={Outline_Multi_Grain}
+        options={({ navigation }) => ({
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "white",
+          },
+          title: "Outline Multi Grain",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <HomeStack.Screen
+        name="Outline_Single_Grain"
+        component={Outline_Single_Grain}
+        options={({ navigation }) => ({
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: "white",
+          },
+          title: "Outline Single Grain",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -232,7 +336,12 @@ function ProfileStackScreen() {
           title: "Edit Profile",
           headerLeft: () => (
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon name="arrow-back" size={24} color="black" style={{ marginLeft: 10 }} />
+              <Icon
+                name="arrow-back"
+                size={24}
+                color="black"
+                style={{ marginLeft: 10 }}
+              />
             </TouchableOpacity>
           ),
         })}
@@ -262,25 +371,25 @@ function BottomTabs() {
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          if (route.name === 'Home') {
-            iconName = 'home-outline';
-          } else if (route.name === 'Profile') {
-            iconName = 'person-circle-outline';
-          } else if (route.name === 'About') {
-            iconName = 'information-circle-outline';
+          if (route.name === "Home") {
+            iconName = "home-outline";
+          } else if (route.name === "Profile") {
+            iconName = "person-circle-outline";
+          } else if (route.name === "About") {
+            iconName = "information-circle-outline";
           }
 
           return <Icon name={iconName} color={color} size={size} />;
         },
-        tabBarActiveTintColor: 'green', // Active tab color
-        tabBarInactiveTintColor: 'gray', // Inactive tab color
+        tabBarActiveTintColor: "green", // Active tab color
+        tabBarInactiveTintColor: "gray", // Inactive tab color
         headerShown: false, // Hide header on tab screens
         tabBarStyle: {
-          backgroundColor: 'lightblue',        
-          borderTopColor: 'lightblue',         
-          height: 80,           
-          position: 'absolute',  
-          borderRadius: 15,           
+          backgroundColor: "white",
+          borderTopColor: "white",
+          height: 80,
+          position: "absolute",
+          borderRadius: 15,
         },
       })}
     >
@@ -293,37 +402,49 @@ function BottomTabs() {
 }
 
 export default function App() {
-  return (
-    <NavigationContainer>
-      <AuthStack.Navigator initialRouteName="SplashScreen">
-        {/* Splash Screen */}
-        <AuthStack.Screen
-          name="SplashScreen"
-          component={SplashScreenComponent}
-          options={{ headerShown: false }}
-        />
+  const [ready, setReady] = useState(false);
 
-        {/* Login Screen */}
-        <AuthStack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        />
+  useEffect(() => {
+    (async () => {
+      await initApiConfig();
+      console.log("Health URL:", apiConfig.getUrl("health"));
+      setReady(true);
+    })();
+  }, []);
 
-        {/* SignUp Screen */}
-        <AuthStack.Screen
-          name="SignUp"
-          component={SignUp}
-          options={{ headerShown: false }}
-        />
+  if (!ready) {
+    return (
+      <NavigationContainer>
+        <AuthStack.Navigator initialRouteName="SplashScreen">
+          {/* Splash Screen */}
+          <AuthStack.Screen
+            name="SplashScreen"
+            component={SplashScreenComponent}
+            options={{ headerShown: false }}
+          />
 
-        {/* Main App Flow */}
-        <AuthStack.Screen
-          name="MainApp"
-          component={BottomTabs}
-          options={{ headerShown: false }}
-        />
-      </AuthStack.Navigator>
-    </NavigationContainer>
-  );
+          {/* Login Screen */}
+          <AuthStack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
+
+          {/* SignUp Screen */}
+          <AuthStack.Screen
+            name="SignUp"
+            component={SignUp}
+            options={{ headerShown: false }}
+          />
+
+          {/* Main App Flow */}
+          <AuthStack.Screen
+            name="MainApp"
+            component={BottomTabs}
+            options={{ headerShown: false }}
+          />
+        </AuthStack.Navigator>
+      </NavigationContainer>
+    );
+  }
 }

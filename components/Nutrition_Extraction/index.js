@@ -9,7 +9,7 @@ const NutritionExtraction = ({ navigation }) => {
     {
       id: 1,
       title: 'Single Grain',
-      image: require('../../assets/grain_outline.png'), // Update with your actual image
+      image: require('../../assets/single_grain1.png'), // Update with your actual image
       navigateTo: 'Nutrition_Extraction_Single', // Replace with your actual screen name
     },
     {

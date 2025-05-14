@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import config from "../../config/apiConfig";
+import { AntDesign } from "@expo/vector-icons";
 
 export default function MedicineList() {
   const [medicines, setMedicines] = useState([]);
@@ -19,12 +20,10 @@ export default function MedicineList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [selectedDisease, setSelectedDisease] = useState("");
-  const [diseases, setDiseases] = useState([]);
 
   // Fetch medicine data on component mount
   useEffect(() => {
     fetchMedicines();
-    fetchDiseases();
   }, []);
 
   // Function to fetch medicines from the API
@@ -35,20 +34,10 @@ export default function MedicineList() {
       setMedicines(response.data);
       setFilteredMedicines(response.data);
     } catch (error) {
-      alert("Failed to load medicines");
+      console.error("Error fetching medicines:", error);
+      alert("Failed to load medicines. Please try again later.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Function to fetch disease categories for filtering
-  const fetchDiseases = async () => {
-    try {
-      const url = `${config.getUrl("database")}/getDiseases`;
-      const response = await axios.get(url);
-      setDiseases(response.data);
-    } catch (error) {
-      alert("Failed to load diseases");
     }
   };
 
@@ -58,10 +47,17 @@ export default function MedicineList() {
     filterMedicines(query, selectedDisease);
   };
 
-  // Function to handle disease filter change
+  // Function to handle disease selection
   const handleDiseaseChange = (disease) => {
     setSelectedDisease(disease);
     filterMedicines(searchQuery, disease);
+  };
+
+  // Function to clear all filters
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedDisease("");
+    setFilteredMedicines(medicines);
   };
 
   // Function to filter medicines based on search query and disease filter
@@ -78,16 +74,43 @@ export default function MedicineList() {
     setFilteredMedicines(filtered);
   };
 
+  // Get unique diseases for the filter options
+  const uniqueDiseases = [...new Set(medicines.map(medicine => medicine.disease))];
+
   // Function to handle medicine click, redirecting to the purchase link
-  const handleMedicineClick = (link) => {
-    // Open the medicine purchase website (this opens the link in the browser)
-    Linking.openURL(link);
+  const handleMedicineClick = (medicine) => {
+    Linking.openURL(medicine.link).catch((err) => {
+      console.error("Failed to open URL:", err);
+      alert("Couldn't open the medicine link. Please try again.");
+    });
   };
 
+  // Render medicine card
+  const renderMedicineCard = ({ item }) => (
+    <TouchableOpacity
+      style={styles.medicineCard}
+      activeOpacity={0.7}
+      onPress={() => handleMedicineClick(item)}
+    >
+      <View style={styles.medicineCardContent}>
+        <Text style={styles.medicineName}>{item.name}</Text>
+        <View style={styles.diseaseTag}>
+          <Text style={styles.medicineDisease}>{item.disease}</Text>
+        </View>
+      </View>
+      <View style={styles.viewDetailsButton}>
+        <Text style={styles.viewDetailsText}>View Details</Text>
+        <AntDesign name="arrowright" size={16} color="white" />
+      </View>
+    </TouchableOpacity>
+  );
+
+  // Loading screen
   if (loading) {
     return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#e76f51" />
+      <View style={styles.centeredContainer}>
+        <ActivityIndicator size="large" color="#3B7A57" />
+        <Text style={styles.loadingText}>Loading medicines...</Text>
       </View>
     );
   }
@@ -98,47 +121,115 @@ export default function MedicineList() {
         source={require("../../assets/background.png")}
         style={styles.backgroundImage}
       >
-        <Text style={styles.title}>Medicine List</Text>
-
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by medicine name"
-          value={searchQuery}
-          onChangeText={handleSearch}
-        />
-
-        <View style={styles.filterContainer}>
-          <Text style={styles.filterLabel}>Filter by Disease:</Text>
-          <TextInput
-            style={styles.filterInput}
-            placeholder="Select Disease"
-            value={selectedDisease}
-            onChangeText={handleDiseaseChange}
-          />
+        <View style={styles.headerContainer}>
+          <Text style={styles.title}>Medicine List</Text>
         </View>
 
-        {filteredMedicines.length === 0 ? (
-          <Text style={styles.noResultsText}>No medicines found</Text>
-        ) : (
-          <FlatList
-            data={filteredMedicines}
-            keyExtractor={(item, index) =>
-              item.id ? item.id.toString()
-              : item.name ? item.name
-              : index.toString()
-            }
-            
-            renderItem={({ item }) => (
+        <View style={styles.contentContainer}>
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputContainer}>
+              <AntDesign name="search1" size={20} color="black" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search medicines..."
+                placeholderTextColor="#666"
+                value={searchQuery}
+                onChangeText={handleSearch}
+              />
+              {searchQuery ? (
+                <TouchableOpacity onPress={() => handleSearch("")}>
+                  <AntDesign name="close" size={20} color="black" />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          </View>
+
+          {/* Disease Filter */}
+          <View style={styles.filterContainer}>
+            <Text style={styles.filterLabel}>Filter by Disease:</Text>
+            <View style={styles.diseaseButtonsContainer}>
               <TouchableOpacity
-                style={styles.medicineCard}
-                onPress={() => handleMedicineClick(item.link)}
+                style={[
+                  styles.diseaseButton,
+                  selectedDisease === "" && styles.selectedDiseaseButton,
+                ]}
+                onPress={() => handleDiseaseChange("")}
               >
-                <Text style={styles.medicineName}>{item.name}</Text>
-                <Text style={styles.medicineDisease}>{item.disease}</Text>
+                <Text 
+                  style={[
+                    styles.diseaseButtonText,
+                    selectedDisease === "" && styles.selectedDiseaseButtonText,
+                  ]}
+                >
+                  All
+                </Text>
               </TouchableOpacity>
-            )}
-          />
-        )}
+              
+              <FlatList
+                data={uniqueDiseases}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[
+                      styles.diseaseButton,
+                      selectedDisease === item && styles.selectedDiseaseButton,
+                    ]}
+                    onPress={() => handleDiseaseChange(item)}
+                  >
+                    <Text 
+                      style={[
+                        styles.diseaseButtonText,
+                        selectedDisease === item && styles.selectedDiseaseButtonText,
+                      ]}
+                    >
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </View>
+
+          {/* Clear Filters Button */}
+          {(searchQuery || selectedDisease) && (
+            <TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
+              <Text style={styles.clearButtonText}>Clear Filters</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* Results Counter */}
+          <View style={styles.resultsContainer}>
+            <Text style={styles.resultsCounter}>
+              {filteredMedicines.length} {filteredMedicines.length === 1 ? "medicine" : "medicines"} found
+            </Text>
+          </View>
+
+          {/* Medicine List */}
+          {filteredMedicines.length === 0 ? (
+            <View style={styles.noResultsContainer}>
+              <AntDesign name="exclamationcircleo" size={60} color="#999" />
+              <Text style={styles.noResultsText}>No medicines found</Text>
+              <Text style={styles.noResultsSubtext}>
+                Try adjusting your search or filters
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredMedicines}
+              keyExtractor={(item, index) =>
+                item.id ? item.id.toString()
+                : item.name ? item.name
+                : index.toString()
+              }
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.medicineList}
+              renderItem={renderMedicineCard}
+            />
+          )}
+        </View>
       </ImageBackground>
     </View>
   );
@@ -147,67 +238,181 @@ export default function MedicineList() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: "100%"
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
   },
   backgroundImage: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
+    width: '100%',
+  },
+  headerContainer: {
     paddingTop: 50,
-    width: "100%",
+    paddingBottom: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  contentContainer: {
+    flex: 1,
+    width: '100%',
+    paddingHorizontal: 16,
   },
   title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    color: "black",
-    marginBottom: 20,
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: 'black',
+    textAlign: 'center',
+  },
+  searchContainer: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  searchInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    borderWidth: 2,
+    borderColor: '#3B7A57',
+    height: 50,
+  },
+  searchIcon: {
+    marginRight: 10,
   },
   searchInput: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    width: "80%",
+    flex: 1,
+    height: 45,
+    fontSize: 16,
+    color: "black",
   },
   filterContainer: {
-    marginBottom: 20,
+    width: "100%",
+    marginBottom: 16,
   },
   filterLabel: {
     fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: 8,
   },
-  filterInput: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
+  diseaseButtonsContainer: {
+    flexDirection: "row",
+  },
+  diseaseButton: {
+    backgroundColor: "white",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 2,
+    borderColor: '#3B7A57',
+  },
+  selectedDiseaseButton: {
+    backgroundColor: "yellowgreen",
+  },
+  diseaseButtonText: {
+    color: "black",
+    fontWeight: "500",
+  },
+  selectedDiseaseButtonText: {
+    color: "black",
+    fontWeight: "bold",
+  },
+  clearButton: {
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  clearButtonText: {
+    color: "#3B7A57",
+    fontWeight: "600",
+  },
+  resultsContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  resultsCounter: {
+    fontSize: 14,
+    color: "black",
+  },
+  medicineList: {
+    paddingBottom: 20,
     width: "100%",
+  },
+  noResultsContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
   },
   noResultsText: {
     fontSize: 18,
+    fontWeight: "bold",
     color: "#666",
+    marginTop: 15,
+  },
+  noResultsSubtext: {
+    fontSize: 14,
+    color: "#888",
+    marginTop: 5,
   },
   medicineCard: {
-    backgroundColor: "#e76f51",
+    backgroundColor: "white",
+    borderRadius: 12,
+    marginBottom: 15,
+    borderWidth: 2,
+    borderColor: '#3B7A57',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    overflow: 'hidden',
+  },
+  medicineCardContent: {
+    backgroundColor: "yellowgreen",
     padding: 15,
-    marginBottom: 10,
-    borderRadius: 8,
-    width: "100%",
-    alignItems: "center",
   },
   medicineName: {
     fontSize: 18,
-    fontWeight: "600",
-    color: "#fff",
+    fontWeight: "bold",
+    color: "black",
+    marginBottom: 8,
+  },
+  diseaseTag: {
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    alignSelf: "flex-start",
   },
   medicineDisease: {
-    fontSize: 14,
-    color: "#fff",
+    fontSize: 13,
+    color: "black",
+    fontWeight: "500",
+  },
+  viewDetailsButton: {
+    backgroundColor: '#3B7A57',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  viewDetailsText: {
+    color: "white",
+    fontWeight: "600",
+    marginRight: 5,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#3B7A57",
   },
 });

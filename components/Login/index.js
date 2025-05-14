@@ -28,7 +28,7 @@ const Login = ({ navigation }) => {
     try {
       // Using the getUrl to get the correct backend URL
       const url = `${config.getUrl("database")}/login`; 
-      console.log(url);
+      //console.log(url);
       const response = await axios.post(url, {
         username,
         password,
